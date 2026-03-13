@@ -1,24 +1,50 @@
-// Smooth header shift
-window.addEventListener('scroll', () => {
-    const nav = document.getElementById('navbar');
-    if (window.scrollY > 50) {
-        nav.style.background = "rgba(10, 10, 11, 0.8)";
-        nav.style.padding = "10px 0";
-    } else {
-        nav.style.background = "transparent";
-        nav.style.padding = "20px 0";
-    }
+const menu = document.querySelector('#mobile-menu');
+const navLinks = document.querySelector('.nav-links');
+
+menu.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+    menu.classList.toggle('is-active');
 });
 
-// Subtle background mouse follow effect
-document.addEventListener('mousemove', (e) => {
-    const glow = document.querySelector('.bg-glow');
-    glow.style.left = (e.clientX - 300) + 'px';
-    glow.style.top = (e.clientY - 300) + 'px';
-});
+const startCounters = () => {
+    const counters = document.querySelectorAll('.stat-number');
+    counters.forEach(counter => {
+        const updateCount = () => {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+            const increment = target / 100;
 
-// Form Submission feedback
-document.getElementById('contactForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    alert("Connection Request Sent. Welcome to the future of Risk.");
+            if (count < target) {
+                counter.innerText = Math.ceil(count + increment);
+                setTimeout(updateCount, 20);
+            } else {
+                counter.innerText = target;
+            }
+        };
+        updateCount();
+    });
+};
+
+const handleReveal = () => {
+    const reveals = document.querySelectorAll('.reveal');
+    reveals.forEach(el => {
+        const windowHeight = window.innerHeight;
+        const revealTop = el.getBoundingClientRect().top;
+        if (revealTop < windowHeight - 100) {
+            el.classList.add('active');
+            if (el.contains(document.querySelector('.hero-stats'))) startCounters();
+        }
+    });
+};
+
+window.addEventListener('scroll', handleReveal);
+window.onload = handleReveal;
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        navLinks.classList.remove('active');
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
 });
